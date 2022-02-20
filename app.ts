@@ -17,7 +17,7 @@ const router = new Router();
 const netlifyEndPoint = `https://analytics.services.netlify.com/v2/${NETLIFY_SITE_ID}/ranking/pages?from=1642654800000&to=1645294136742&timezone=-0500&limit=15`
 
 //GET BLOG VIEW COUNT
-router.get('/blog/:title', async (context) => {
+router.get('/blog', async (context) => {
 
     //GET NETLIFY ANALYTICS
     const response = await fetch(netlifyEndPoint, {
@@ -38,10 +38,7 @@ router.get('/blog/:title', async (context) => {
             blogPostMap.set(blogPost,count)
         }
     }
-    const blogTitle = context.params.title
-    context.response.body = {
-        viewCount: blogPostMap.get(blogTitle)
-    }
+    context.response.body = {blogList: [...blogPostMap.entries()]}
 })
 
 const app = new Application();
