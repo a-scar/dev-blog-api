@@ -14,12 +14,12 @@ export const NETLIFY_TOKEN = Deno.env.get("NETLIFY_TOKEN")
 export const NETLIFY_SITE_ID = Deno.env.get("NETLIFY_SITE_ID")
 
 const router = new Router();
-const netlifyEndPoint = `https://analytics.services.netlify.com/v2/${NETLIFY_SITE_ID}/ranking/pages?from=1642654800000&to=1645294136742&timezone=-0500&limit=15`
+const netlifyEndPoint = `https://analytics.services.netlify.com/v2/${NETLIFY_SITE_ID}/ranking/pages/`
 
 //GET BLOG VIEW COUNT
 router.get('/blog', async (context) => {
 
-    //GET NETLIFY ANALYTICS
+    //NETLIFY ANALYTICS
     const response = await fetch(netlifyEndPoint, {
         headers: {
             Authorization: `Bearer ${NETLIFY_TOKEN}`,
@@ -27,7 +27,7 @@ router.get('/blog', async (context) => {
     });
 
     const dataList: NetlifyResponse  = await response.json();
-    const blogPostMap = new Map();
+    const blogPostList: [string, number][] = [];
 
     for (const [, postDetail] of dataList.data.entries()) {
         const count = postDetail.count;
@@ -35,10 +35,10 @@ router.get('/blog', async (context) => {
 
         if(path.includes('/posts/')) {
             const blogPost = path.slice(7, path.length - 1) //yea whatever
-            blogPostMap.set(blogPost,count)
+            blogPostList.push([blogPost, count])
         }
     }
-    context.response.body = {blogList: [...blogPostMap.entries()]}
+    context.response.body = {blogList: blogPostList}
 })
 
 const app = new Application();
